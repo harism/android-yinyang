@@ -13,3 +13,6 @@ size reasons. While making rendering as dynamic as possible - it comes along
 with the good news as file size tends to drop significantly.
 
 That said, hope you enjoy this tiny Yin Yang live wallpaper for Android devices.
+
+Compiled application can be downloaded from Google Play store;
+http://play.google.com/store/apps/details?id=fi.harism.wallpaper.lovebeat

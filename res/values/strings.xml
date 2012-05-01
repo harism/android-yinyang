@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- General strings -->
+    <string name="app_name">Yin Yang</string>
+    <string name="author">harism</string>
+    <string name="description">Yin Yang, live OpenGL 2.0 ES wallpaper.</string>
+
+    <!-- Error strings -->
+    <string name="error_shader_compiler">Yin Yang error; GLSL shader compiler not supported.</string>
+
+</resources>

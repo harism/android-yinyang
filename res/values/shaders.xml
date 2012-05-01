@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+<string name="shader_vs">
+uniform vec2 uAspectRatio;
+attribute vec2 aPosition;
+varying vec2 vPosition;
+void main() {
+    gl_Position = vec4(aPosition, 0.0, 1.0);
+    vPosition = aPosition * uAspectRatio;
+}
+</string>
+<string name="shader_fs">
+precision mediump float;
+uniform vec2 uTouchPos[2];
+varying vec2 vPosition;
+
+float calcSide(float dist1, float dist2) {
+    if (dist1 &lt; 0.16667 || clamp(dist2, 0.16667, 0.5) == dist2) {
+        return 0.0;
+    }
+    return 1.0;
+}
+
+void main() {
+    float c = 1.0 - sqrt(distance(vPosition, uTouchPos[1]) * 0.25);
+    vec2 pos = vPosition + c * (uTouchPos[0] - uTouchPos[1]);
+    float distCenter = length(pos);
+    if (distCenter &gt; 1.025) {
+        c = 1.0 - (distCenter * 0.33);
+    } else if (distCenter &gt; 1.0) {
+        c = 0.0;
+    } else {
+        float distTop = distance(pos, vec2(0.0, 0.5));
+        float distBottom = distance(pos, vec2(0.0, -0.5));
+        if (pos.x &lt; 0.0) {
+            c = calcSide(distTop, distBottom);
+        } else {
+            c = 1.0 - calcSide(distBottom, distTop);
+        }
+    }
+    gl_FragColor = vec4(vec3(c), 1.0);
+}
+</string>
+</resources>

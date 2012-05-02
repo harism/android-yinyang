@@ -300,7 +300,7 @@ public final class YinYangService extends WallpaperService {
 						mShaderCompilerSupported, 0);
 
 				// If not, show user an error message and return immediately.
-				if (mShaderCompilerSupported[0] == true) {
+				if (mShaderCompilerSupported[0] == false) {
 					new Handler(Looper.getMainLooper())
 							.post(WallpaperEngine.this);
 					return;

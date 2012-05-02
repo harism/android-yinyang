@@ -24,6 +24,7 @@ import javax.microedition.khronos.opengles.GL10;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.SystemClock;
 import android.service.wallpaper.WallpaperService;
 import android.view.MotionEvent;
@@ -43,13 +44,19 @@ public final class YinYangService extends WallpaperService {
 	/**
 	 * Private wallpaper engine implementation.
 	 */
-	private final class WallpaperEngine extends Engine {
+	private final class WallpaperEngine extends Engine implements Runnable {
 
+		// Screen aspect ratio.
 		private final float mAspectRatio[] = new float[2];
+		// GLSurfaceView implementation.
 		private YinYangSurfaceView mGLSurfaceView;
-		private long mTouchEndTime;
+		// Boolean for indicating whether touch events are being followed.
 		private boolean mTouchFollow = false;
+		// Two {x, y } tuples for indicating touch start and current position.
 		private final float mTouchPositions[] = new float[4];
+		// Last touch event time.
+		private long mTouchTime;
+		// Screen width and height.
 		private int mWidth, mHeight;
 
 		@Override
@@ -72,7 +79,7 @@ public final class YinYangService extends WallpaperService {
 
 		@Override
 		public void onTouchEvent(MotionEvent me) {
-			mTouchEndTime = SystemClock.uptimeMillis();
+			mTouchTime = SystemClock.uptimeMillis();
 			switch (me.getAction()) {
 			// On touch down set following flag and initialize touch position
 			// start
@@ -111,6 +118,12 @@ public final class YinYangService extends WallpaperService {
 			}
 		}
 
+		@Override
+		public void run() {
+			Toast.makeText(YinYangService.this, R.string.error_shader_compiler,
+					Toast.LENGTH_LONG).show();
+		}
+
 		/**
 		 * Lazy as I am, I din't bother using GLWallpaperService (found on
 		 * GitHub) project for wrapping OpenGL functionality into my wallpaper
@@ -122,8 +135,11 @@ public final class YinYangService extends WallpaperService {
 		public final class YinYangSurfaceView extends GLSurfaceView implements
 				GLSurfaceView.Renderer {
 
+			// Screen vertices filling whole view.
 			private ByteBuffer mScreenVertices;
+			// Boolean value for indicating if shader compiler is supported.
 			private final boolean mShaderCompilerSupported[] = new boolean[1];
+			// Our one and only shader program id.
 			private int mShaderProgram = -1;
 
 			/**
@@ -147,6 +163,15 @@ public final class YinYangService extends WallpaperService {
 				return WallpaperEngine.this.getSurfaceHolder();
 			}
 
+			/**
+			 * Private shader program loader method.
+			 * 
+			 * @param vs
+			 *            Vertex shader source.
+			 * @param fs
+			 *            Fragment shader source.
+			 * @return Shader program id.
+			 */
 			private int loadProgram(String vs, String fs) {
 				int vertexShader = loadShader(GLES20.GL_VERTEX_SHADER, vs);
 				int fragmentShader = loadShader(GLES20.GL_FRAGMENT_SHADER, fs);
@@ -167,6 +192,15 @@ public final class YinYangService extends WallpaperService {
 				return program;
 			}
 
+			/**
+			 * Private shader loader method.
+			 * 
+			 * @param shaderType
+			 *            Vertex or fragment shader.
+			 * @param source
+			 *            Shader source code.
+			 * @return Loaded shader id.
+			 */
 			private int loadShader(int shaderType, String source) {
 				int shader = GLES20.glCreateShader(shaderType);
 				if (shader != 0) {
@@ -213,13 +247,13 @@ public final class YinYangService extends WallpaperService {
 					// once they are equal. We use interpolation for smoother
 					// transition no matter what the rendering frame rate is.
 					float t = Math.max(0f,
-							1f - (currentTime - mTouchEndTime) * .005f);
+							1f - (currentTime - mTouchTime) * .005f);
 					mTouchPositions[2] = mTouchPositions[0]
 							+ (mTouchPositions[2] - mTouchPositions[0]) * t;
 					mTouchPositions[3] = mTouchPositions[1]
 							+ (mTouchPositions[3] - mTouchPositions[1]) * t;
 
-					mTouchEndTime = currentTime;
+					mTouchTime = currentTime;
 
 					if (Math.abs(mTouchPositions[0] - mTouchPositions[2]) > 0.0001f
 							|| Math.abs(mTouchPositions[1] - mTouchPositions[3]) > 0.0001f) {
@@ -266,17 +300,9 @@ public final class YinYangService extends WallpaperService {
 						mShaderCompilerSupported, 0);
 
 				// If not, show user an error message and return immediately.
-				if (mShaderCompilerSupported[0] == false) {
-					Handler handler = new Handler(
-							YinYangService.this.getMainLooper());
-					handler.post(new Runnable() {
-						@Override
-						public void run() {
-							Toast.makeText(YinYangService.this,
-									R.string.error_shader_compiler,
-									Toast.LENGTH_LONG).show();
-						}
-					});
+				if (mShaderCompilerSupported[0] == true) {
+					new Handler(Looper.getMainLooper())
+							.post(WallpaperEngine.this);
 					return;
 				}
 

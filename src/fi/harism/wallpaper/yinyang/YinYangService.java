@@ -16,6 +16,8 @@
 
 package fi.harism.wallpaper.yinyang;
 
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 
 import javax.microedition.khronos.egl.EGLConfig;
@@ -35,6 +37,25 @@ import android.widget.Toast;
  * Wallpaper entry point.
  */
 public final class YinYangService extends WallpaperService {
+
+	/**
+	 * Private method for loading raw String resources.
+	 * 
+	 * @param resourceId
+	 *            Raw resource id.
+	 * @return Resource as a String.
+	 * @throws Exception
+	 */
+	private String loadRawResource(int resourceId) throws Exception {
+		InputStream is = getResources().openRawResource(resourceId);
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		byte[] buf = new byte[1024];
+		int len;
+		while ((len = is.read(buf)) != -1) {
+			baos.write(buf, 0, len);
+		}
+		return baos.toString();
+	}
 
 	@Override
 	public Engine onCreateEngine() {
@@ -306,10 +327,15 @@ public final class YinYangService extends WallpaperService {
 					return;
 				}
 
-				// Shader compiler supported, load shader.
-				mShaderProgram = loadProgram(
-						YinYangService.this.getString(R.string.shader_vs),
-						YinYangService.this.getString(R.string.shader_fs));
+				// Shader compiler supported, try to load shader.
+				try {
+					String vs = loadRawResource(R.raw.yinyang_vs);
+					String fs = loadRawResource(R.raw.yinyang_fs);
+					mShaderProgram = loadProgram(vs, fs);
+				} catch (Exception ex) {
+					mShaderCompilerSupported[0] = false;
+					ex.printStackTrace();
+				}
 			}
 
 		}

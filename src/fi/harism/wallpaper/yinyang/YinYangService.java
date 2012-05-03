@@ -103,17 +103,16 @@ public final class YinYangService extends WallpaperService {
 			mTouchTime = SystemClock.uptimeMillis();
 			switch (me.getAction()) {
 			// On touch down set following flag and initialize touch position
-			// start
-			// and current values.
+			// start and current values.
 			case MotionEvent.ACTION_DOWN:
 				mTouchFollow = true;
-				mTouchPositions[0] = mTouchPositions[2] = (((2f * me.getX()) / mWidth) - 1f)
+				mTouchPositions[0] = (((2f * me.getX()) / mWidth) - 1f)
 						* mAspectRatio[0];
-				mTouchPositions[1] = mTouchPositions[3] = (1f - ((2f * me
-						.getY()) / mHeight)) * mAspectRatio[1];
-				mGLSurfaceView.requestRender();
-				break;
-			// On touch move update current position only.
+				mTouchPositions[1] = (1f - ((2f * me.getY()) / mHeight))
+						* mAspectRatio[1];
+				// Flow through..
+
+				// On touch move update current position only.
 			case MotionEvent.ACTION_MOVE:
 				mTouchPositions[2] = (((2f * me.getX()) / mWidth) - 1f)
 						* mAspectRatio[0];

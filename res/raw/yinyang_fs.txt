@@ -1,51 +1,47 @@
 precision mediump float;
 uniform vec2 uTouchPos[2];
-varying vec2 vPosition;
+varying vec2 vPos;
+varying float vGrad;
 
 float grad(float c, float d, float d1, float d2, float c1, float c2) {
 	if (clamp(d, d1, d2) == d) {
 		float l = d2 - d1;
-		c *= mix(c1, c2, (d - d1) / l);
+		c = mix(c1, c2, (d - d1) / l);
 	}
 	return c;
 }
 
-#define R1 0.1175
-#define R2 0.1425
-
 void main() {
-	float c = 1.0 - sqrt(distance(vPosition, uTouchPos[1]) * 0.25);
-	vec2 pos = vPosition + c * (uTouchPos[0] - uTouchPos[1]);
+	float c = 1.0 - sqrt(distance(vPos, uTouchPos[1]) * 0.25);
+	vec2 pos = vPos + c * (uTouchPos[0] - uTouchPos[1]);
 
 	float distC = length(pos);
 
 	if (distC > 1.025) {
 		c = 1.0 - (distC * 0.33);
-		c = grad(c, distC, 1.025, 1.05, 0.0, 1.0);
-	} else if (distC > 1.0) {
-		c = 0.0;
+		c = grad(c, distC, 1.02, 1.05, vGrad, c);
 	} else {
-		c = 0.0;
+		c = vGrad;
 		float distT = distance(pos, vec2(0.0, 0.5));
 		float distB = distance(pos, vec2(0.0, -0.5));
 
 		int k = 0;
-		if (pos.x < 0.0 && !(distT < R1 || clamp(distB, R2, 0.5) == distB)) {
+		if (pos.x < 0.0 && !(distT < 0.115 || clamp(distB, 0.145, 0.5) == distB)) {
 			k = 1;
-		} else if (pos.x >= 0.0 && (distB < R2 || clamp(distT, R1, 0.5) == distT)) {
+		} else if (pos.x >= 0.0 && (distB < 0.145 || clamp(distT, 0.115, 0.5) == distT)) {
 			k = 2;
 		}
 
-		if (k > 0) {			
-			c = mix(0.8, 1.0, (pos.y + 1.0) * 0.5);
-			c = grad(c, distT, R1, R2, 0.0, 1.0);
-			c = grad(c, distB, R1, R2, 1.0, 0.0);
+		if (distC < 1.0 && k > 0) {			
+			c = 0.7 + vGrad;
+			c = grad(c, distT, 0.115, 0.145, vGrad, c);
+			c = grad(c, distB, 0.115, 0.145, c, vGrad);
 
 			if (k == 1) {
-				c = grad(c, distC, 0.975, 1.0, 1.0, 0.0);
-				c = grad(c, distB, 0.5, 0.525, 0.0, 1.0);
+				c = grad(c, distC, 0.97, 1.0, c, vGrad);
+				c = grad(c, distB, 0.5, 0.53, vGrad, c);
 			} else {
-				c = grad(c, distT, 0.475, 0.5, 1.0, 0.0);
+				c = grad(c, distT, 0.47, 0.5, c, vGrad);
 			}
 		}
 	}

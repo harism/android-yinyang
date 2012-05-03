@@ -46,7 +46,7 @@ public final class YinYangService extends WallpaperService {
 	 * @return Resource as a String.
 	 * @throws Exception
 	 */
-	private String loadRawResource(int resourceId) throws Exception {
+	private final String loadRawResource(int resourceId) throws Exception {
 		InputStream is = getResources().openRawResource(resourceId);
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		byte[] buf = new byte[1024];
@@ -58,7 +58,7 @@ public final class YinYangService extends WallpaperService {
 	}
 
 	@Override
-	public Engine onCreateEngine() {
+	public final Engine onCreateEngine() {
 		return new WallpaperEngine();
 	}
 
@@ -92,14 +92,14 @@ public final class YinYangService extends WallpaperService {
 		}
 
 		@Override
-		public void onDestroy() {
+		public final void onDestroy() {
 			super.onDestroy();
 			mGLSurfaceView.onDestroy();
 			mGLSurfaceView = null;
 		}
 
 		@Override
-		public void onTouchEvent(MotionEvent me) {
+		public final void onTouchEvent(MotionEvent me) {
 			mTouchTime = SystemClock.uptimeMillis();
 			switch (me.getAction()) {
 			// On touch down set following flag and initialize touch position
@@ -129,7 +129,7 @@ public final class YinYangService extends WallpaperService {
 		}
 
 		@Override
-		public void onVisibilityChanged(boolean visible) {
+		public final void onVisibilityChanged(boolean visible) {
 			super.onVisibilityChanged(visible);
 			if (visible) {
 				mGLSurfaceView.onResume();
@@ -139,7 +139,7 @@ public final class YinYangService extends WallpaperService {
 		}
 
 		@Override
-		public void run() {
+		public final void run() {
 			Toast.makeText(YinYangService.this, R.string.error_shader_compiler,
 					Toast.LENGTH_LONG).show();
 		}
@@ -152,7 +152,7 @@ public final class YinYangService extends WallpaperService {
 		 * one GLSurfaceView extends. For saving some bytes Renderer is
 		 * implemented here too.
 		 */
-		public final class YinYangSurfaceView extends GLSurfaceView implements
+		private final class YinYangSurfaceView extends GLSurfaceView implements
 				GLSurfaceView.Renderer {
 
 			// Screen vertices filling whole view.
@@ -165,7 +165,7 @@ public final class YinYangService extends WallpaperService {
 			/**
 			 * Default constructor.
 			 */
-			public YinYangSurfaceView() {
+			private YinYangSurfaceView() {
 				super(YinYangService.this);
 
 				setEGLContextClientVersion(2);
@@ -179,7 +179,7 @@ public final class YinYangService extends WallpaperService {
 			}
 
 			@Override
-			public SurfaceHolder getHolder() {
+			public final SurfaceHolder getHolder() {
 				return WallpaperEngine.this.getSurfaceHolder();
 			}
 
@@ -192,7 +192,7 @@ public final class YinYangService extends WallpaperService {
 			 *            Fragment shader source.
 			 * @return Shader program id.
 			 */
-			private int loadProgram(String vs, String fs) {
+			private final int loadProgram(String vs, String fs) {
 				int vertexShader = loadShader(GLES20.GL_VERTEX_SHADER, vs);
 				int fragmentShader = loadShader(GLES20.GL_FRAGMENT_SHADER, fs);
 				int program = GLES20.glCreateProgram();
@@ -221,7 +221,7 @@ public final class YinYangService extends WallpaperService {
 			 *            Shader source code.
 			 * @return Loaded shader id.
 			 */
-			private int loadShader(int shaderType, String source) {
+			private final int loadShader(int shaderType, String source) {
 				int shader = GLES20.glCreateShader(shaderType);
 				if (shader != 0) {
 					GLES20.glShaderSource(shader, source);
@@ -243,12 +243,12 @@ public final class YinYangService extends WallpaperService {
 			 * onDetachedFromWindow() will stop rendering thread which is lost
 			 * otherwise.
 			 */
-			public void onDestroy() {
+			public final void onDestroy() {
 				super.onDetachedFromWindow();
 			}
 
 			@Override
-			public void onDrawFrame(GL10 unused) {
+			public final void onDrawFrame(GL10 unused) {
 
 				// Clear screen buffer.
 				GLES20.glClearColor(0, 0, 0, 1);
@@ -304,7 +304,8 @@ public final class YinYangService extends WallpaperService {
 			}
 
 			@Override
-			public void onSurfaceChanged(GL10 unused, int width, int height) {
+			public final void onSurfaceChanged(GL10 unused, int width,
+					int height) {
 				mWidth = width;
 				mHeight = height;
 
@@ -314,7 +315,7 @@ public final class YinYangService extends WallpaperService {
 			}
 
 			@Override
-			public void onSurfaceCreated(GL10 unused, EGLConfig config) {
+			public final void onSurfaceCreated(GL10 unused, EGLConfig config) {
 				// Check if shader compiler is supported.
 				GLES20.glGetBooleanv(GLES20.GL_SHADER_COMPILER,
 						mShaderCompilerSupported, 0);

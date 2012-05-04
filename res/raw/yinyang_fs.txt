@@ -5,8 +5,7 @@ varying float vGrad;
 
 float grad(float c, float d, float d1, float d2, float c1, float c2) {
 	if (clamp(d, d1, d2) == d) {
-		float l = d2 - d1;
-		c = mix(c1, c2, (d - d1) / l);
+		c = mix(c1, c2, (d - d1) / (d2 - d1));
 	}
 	return c;
 }

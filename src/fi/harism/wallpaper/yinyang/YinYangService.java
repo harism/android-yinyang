@@ -133,6 +133,7 @@ public final class YinYangService extends WallpaperService {
 			super.onVisibilityChanged(visible);
 			if (visible) {
 				mGLSurfaceView.onResume();
+				mGLSurfaceView.requestRender();
 			} else {
 				mGLSurfaceView.onPause();
 			}

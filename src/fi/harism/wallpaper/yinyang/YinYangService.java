@@ -193,7 +193,8 @@ public final class YinYangService extends WallpaperService {
 			 *            Fragment shader source.
 			 * @return Shader program id.
 			 */
-			private final int loadProgram(String vs, String fs) throws Exception {
+			private final int loadProgram(String vs, String fs)
+					throws Exception {
 				int vertexShader = loadShader(GLES20.GL_VERTEX_SHADER, vs);
 				int fragmentShader = loadShader(GLES20.GL_FRAGMENT_SHADER, fs);
 				int program = GLES20.glCreateProgram();
@@ -222,7 +223,8 @@ public final class YinYangService extends WallpaperService {
 			 *            Shader source code.
 			 * @return Loaded shader id.
 			 */
-			private final int loadShader(int shaderType, String source) throws Exception {
+			private final int loadShader(int shaderType, String source)
+					throws Exception {
 				int shader = GLES20.glCreateShader(shaderType);
 				if (shader != 0) {
 					GLES20.glShaderSource(shader, source);
